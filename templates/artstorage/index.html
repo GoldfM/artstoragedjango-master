@@ -1,0 +1,14 @@
+{% extends 'artstorage/base.html' %}
+{% load static %}
+
+{% block content %}
+    <main class="main-container">
+        <section class="begin-page">
+            <h2 class="visually-hidden">Начало работы</h2>
+            <p class="begin-page__title">Измени свою жизнь сегодня</p>
+            <p class="begin-page__description">Создавай, делись, смотри, вдохновляйся, оценивай</p>
+            <a class="begin-page__button" href="{% url 'authorization' %}">Начать</a>
+            <img class="begin-page__welcome-picture" src="{% static 'artstorage/img/Welcome-picture.png' %}" alt="Илюстрация множества изображений.">
+        </section>
+    </main>
+{% endblock content %}

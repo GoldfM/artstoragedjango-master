@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'artstorage/css/style.css' %}">
+    <title>ArtStorage</title>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="main-nav">
+            <div class="main-nav__general reset-list general">
+                <ul class="general__list reset-list">
+                    <li><div style="width: 80px"></div></li>
+                    <li class="general__item item">
+                        <a class="item__link" href="{% url 'authors' %}">Авторы</a>
+                    </li>
+                    <li><div style="width: 60px"></div></li>
+
+                    <li class="general__item item">
+                        <a class="item__link" href="{% url 'pictures' %}">Картины</a>
+                    </li>
+                </ul>
+            </div>
+             <a class="logo" href="{% url 'home' %}">
+                <img src="{% static 'artstorage/img/logo.svg' %}" alt="Логотип ArtStorage.">
+            </a>
+            <div class="main-nav__user user">
+
+                <a class="user__open-settings" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0,0,256,256" width="50px" height="50px" fill-rule="nonzero"><g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.12,5.12)"><path d="M5,9v2h40v-2zM5,24v2h40v-2zM5,39v2h40v-2z"></path></g></g></svg>
+                </a>
+
+                <div class="user__settings-container">
+                    {% if request.user.is_authenticated %}
+                    <a class="user__profile-link profile-link" href="{% url 'profile' slug=request.user.slug %}">Профиль</a>
+                    <a class="user__edit" href="{% url 'editProfile' slug=request.user.slug %}">Редактировать</a>
+                    <a class="user__exit" href="{% url 'logout' %}">Выход</a>
+                    {% else %}
+                    <a class="user__profile-link profile-link" href="{% url 'registration' %}">Зарегистрироваться</a>
+                    <a class="user__edit" href="{% url 'authorization' %}">Войти</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    </header>
+{% block content %}
+{% endblock content %}
+
+    <footer class="main-footer">
+        <div class="copyright-container">
+            <img class="copyright-container__picture" src="{% static 'artstorage/img/copyright.svg' %}" alt="Copyright">
+            <p class="copyright-container__title">ArtStorage Design</p>
+        </div>
+    </footer>
+
+{#    <script src="{% static 'artstorage/popup.js' %}"></script>#}
+</body>
+</html>

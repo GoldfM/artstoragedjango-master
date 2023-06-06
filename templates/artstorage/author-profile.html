@@ -1,0 +1,126 @@
+{% extends 'artstorage/base.html' %}
+{% load static %}
+
+{% block content %}
+
+    <main class="main-container">
+        <section class="author-profile">
+            <h2 class="visually-hidden">Профиль автора</h2>
+            {% if user.photo %}
+                <img src="{{ user.photo.url }}" class="author-profile__photo" alt="Фотография пользователя">
+            {% else %}
+                <img src="{% static 'artstorage/img/example.jpg' %}" class="author-profile__photo" alt="Фотография пользователя">
+            {% endif %}
+
+            <span class="author-profile__name">{{ user.first_name }} {{ user.last_name }}</span>
+            <span class="author-profile__description">{{ user.descriptions }}</span>
+            <div class="decorative-line"></div>
+            
+            <div class="author-profile__information-form information-form" action="#" method="get">
+                {% if is_not_your_profile %}
+                    {% if request.user.is_authenticated %}
+                        {% if request.user.id not in user.get_followings %}
+                            <form action="{% url 'subscribe' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <input type="hidden" name="redirect_url" value="{{ request.get_full_path }}">
+                            <button class="information-form__subscribe subscribe--change" type="submit">Подписаться</button>
+                            </form>
+
+                        {% else %}
+                            <form action="{% url 'unsubscribe' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <input type="hidden" name="redirect_url" value="{{ request.get_full_path }}">
+                            <button class="information-form__subscribe subscribe--change" type="submit">Отписаться</button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <div style="height: 20px"></div>
+
+                    {% endif %}
+
+                {% else %}
+                <div style="height: 20px"></div>
+                {% endif %}
+                <dl class="information-form__description-list description-list">
+                    <div class="description-list__item-container item-container">
+                        <dt class="item-container__item item-description">
+                            <output class="item-description__value">{{ user.count_projects }}</output>
+                        </dt>
+                        <dd class="item-container__item-description">Картин</dd>
+                    </div>
+
+                    <div class="description-list__item-container item-container">
+                        <dt class="item-container__item item-description">
+                            <output class="item-description__value">{{ user.get_views }}</output>
+                        </dt>
+                        <dd class="item-container__item-description">Просмотров</dd>
+                    </div>
+
+                    <div class="description-list__item-container item-container">
+                        <dt class="item-container__item item-description">
+                            <output class="item-description__value">{{ user.count_followings }}</output>
+                        </dt>
+                        <dd class="item-container__item-description">Подписки</dd>
+                    </div>
+
+                    <div class="description-list__item-container item-container">
+                        <dt class="item-container__item item-description">
+                            <output class="item-description__value">{{ user.count_followers }}</output>
+                        </dt>
+                        <dd class="item-container__item-description">Подписчики</dd>
+                    </div>
+
+{#                    <div class="description-list__item-container item-container">#}
+{#                        <dt class="item-container__item item-description">#}
+{#                            <output class="item-description__value">9</output>#}
+{#                        </dt>#}
+{#                        <dd class="item-container__item-description">Проекты</dd>#}
+{#                    </div>#}
+                </dl>
+            </div>
+
+            <div class="author-profile__pictures-container">
+                {% for proj in projects %}
+                    <a href="{% url 'project' user_slug=proj.user.slug project_slug=proj.slug %}"><img class="author-profile__pictures" src="{{ proj.photo.url }}" alt=""></a>
+                <div class="decorative-line"></div>
+                {% endfor %}
+            </div>
+
+            <div class="moving">
+                <ul class="moving__list reset-list">
+                {% if page_obj.has_previous %}
+                    <li class="moving__back">
+                        <a href="?page={{ page_obj.previous_page_number }}">
+                            <svg width="27" height="8" viewBox="0 0 27 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0.646446 3.64645C0.451185 3.84171 0.451185 4.15829 0.646446 4.35355L3.82843 7.53553C4.02369 7.7308 4.34027 7.7308 4.53553 7.53553C4.7308 7.34027 4.7308 7.02369 4.53553 6.82843L1.70711 4L4.53553 1.17157C4.7308 0.976311 4.7308 0.659728 4.53553 0.464466C4.34027 0.269204 4.02369 0.269204 3.82843 0.464466L0.646446 3.64645ZM27 3.5L1 3.5V4.5L27 4.5V3.5Z" fill="white"></path>
+                            </svg>                                
+                        </a>
+                    </li>
+                {% endif %}
+                    {% for p in paginator.page_range %}
+                    <li class="moving__item">
+                        {% if page_obj.number == p %}
+                            <a class="moving__item-link">{{ p }}</a>
+                        {% else %}
+                            <a class="moving__item-link" href="?page={{ p }}">{{ p }}</a>
+
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="moving__next">
+                        <a href="?page={{ page_obj.next_page_number }}">
+                            <svg width="27" height="8" viewBox="0 0 27 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M26.3536 4.35355C26.5488 4.15829 26.5488 3.84171 26.3536 3.64645L23.1716 0.464466C22.9763 0.269204 22.6597 0.269204 22.4645 0.464466C22.2692 0.659728 22.2692 0.976311 22.4645 1.17157L25.2929 4L22.4645 6.82843C22.2692 7.02369 22.2692 7.34027 22.4645 7.53553C22.6597 7.7308 22.9763 7.7308 23.1716 7.53553L26.3536 4.35355ZM0 4.5H26V3.5H0V4.5Z" fill="white"></path>
+                            </svg>                                 
+                        </a>
+                    </li>
+                {% endif %}
+                </ul>    
+            </div>
+        </section>
+
+    </main>
+{% endblock content %}

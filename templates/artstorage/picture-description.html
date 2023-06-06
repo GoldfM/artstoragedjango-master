@@ -1,0 +1,87 @@
+{% extends 'artstorage/base.html' %}
+{% load static %}
+{% block content %}
+    <main class="main-container">
+        <section class="picture-description">
+            <h2 class="visually-hidden">Описание картины</h2>
+            <div class="picture-description__container image-description details">
+                <div class="image-description__container">
+                    <span class="image-description__heading">Название</span>
+                    <span class="image-description__title">{{ project.name }}</span>
+                    <div class="image-description__wrapper img">
+                       <img class="img" width="100%" height="100%" src="{{ project.photo.url }}" alt="#">
+                    </div>
+                </div>
+
+                <div class="details__container detailed-information">
+                    <div class="detailed-information__container author-information">
+                        <a href="{{ project.user.get_absolute_url }}"><img class="author-information__photo" src="{{ user.photo.url }}" alt="#"></a>
+                        <span class="author-information__name">{{ user.get_short_name }}</span>
+                        {% if is_not_your_profile %}
+                        {% if request.user.is_authenticated %}
+                        {% if request.user.id not in user.get_followings %}
+                            <form action="{% url 'subscribe' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <input type="hidden" name="redirect_url" value="{{ request.get_full_path }}">
+                            <button class="information-form__subscribe subscribe--change" type="submit">Подписаться</button>
+                            </form>
+
+                        {% else %}
+                            <form action="{% url 'unsubscribe' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <input type="hidden" name="redirect_url" value="{{ request.get_full_path }}">
+                            <button class="information-form__subscribe subscribe--change" type="submit">Отписаться</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                        {% endif %}
+                    </div>
+
+                    <div class="views">
+                        <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink">
+                            <rect width="28.3476" height="28.3476" fill="url(#pattern0)"></rect>
+                            <defs>
+                                <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+                                    <use xlink:href="#image0_23_687" transform="scale(0.0416667)"></use>
+                                </pattern>
+                                <image id="image0_23_687" width="24" height="24"
+                                    xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAABLElEQVR4nO2UPU4DQQyFt0IgQhEIHQVIhGskpObnCggOgQj0LLcJCbeAAoqkBJpAnxzgQxavWFnjzS5FRJEnWVrN83v2zngmy1b41wC2gStgCEyAuWKitUvL+YvxBnAns0WwnFvTVDXfA16ojzfgYJH5EfCdEA+ADrCp6GqLPEzbjsx3gc+E6LqkoX4i/wNopZKfUp1nv9wa8AB8AVMgtzVxo4Tu0ZufB/vaEW+GHrm440B7WixgY5dCQ7x17TEVtxVox0stcBYkdUu26F5cL9Ce+HNIjd2wcMi5/sQfcjgcvkBLI+bRLxlTu+0e78BOJGgHF22kaWkoekHnpj2MGio+Fc/UxyuwX2peKLKuWzqvYDwDbkxTydwVagIXeovGMpvpeyCuWdt4haXiB7cw0nZvg3MkAAAAAElFTkSuQmCC"></image>
+                            </defs>
+                        </svg>
+                        <span class="views__amount">{{ project.count_watches }}</span>
+                    </div>
+
+{#                    <div class="likes">#}
+{#                        <svg width="29" height="30" viewBox="0 0 29 30" fill="none" xmlns="http://www.w3.org/2000/svg"#}
+{#                            xmlns:xlink="http://www.w3.org/1999/xlink">#}
+{#                            <rect width="28.3476" height="29.3251" fill="url(#pattern0)"></rect>#}
+{#                            <defs>#}
+{#                                <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">#}
+{#                                    <use xlink:href="#image0_23_690"#}
+{#                                        transform="matrix(0.0206897 0 0 0.02 -0.0172414 0)"></use>#}
+{#                                </pattern>#}
+{#                                <image id="image0_23_690" width="50" height="50"#}
+{#                                    xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABrklEQVR4nO3ZPUvDQBjA8QecxAoOBUHcVBwcXLq7dXEVHN2dRfBl9BsUHBy7FIq4dFMni2NB6CAOfgArKfUFQQf/chAw4DW5S21zF/Jfyx33I2kemooUFfkVcMtvn8A1sCa+hb4+sC45gKgegRnxJeI7lpxAAmBacgBRbYsPkVxdcgJ5ENcDpgwg7+J6wKYBZCCuB1wYQO7E5YB54MsAciYuB+xj1o64HHBvgPgGFsTVgA3Dq9ERlwPqhpCTcR6ijX3tyPo54IPx9xo+FVeHQd7S7BpZv8tkC4BFHaSbZrfI+g6Tr6mDtNLsFFmfRS86SM1DSKCD7HkIaeogW55B+sCyDlLxDFL9gwgPUvYM0tBCwsOoYeMLpBcH6XoECeIgLY8gzThIzRNIX/vEGmWWZASpDkWknSUZQRpJkIonkF4SpJwLSJrfJU7eWmlmSQaQJ2BJkoqZJQfqDxrgMEPIlREiYZaUws9nM4Q0jBAJs0RdiRJwlCHk2QZiNUsmDBnYQCoOQ85tIFazZNSXF5avf1aMIeGhLg03v4msUd+fU3Uf/zPgRV0Ja0RRUVE++wE9P8mE/bQpMQAAAABJRU5ErkJggg=="></image>#}
+{#                            </defs>#}
+{#                        </svg>#}
+{#                        <span class="likes__amount">250</span>#}
+{#                    </div>#}
+{#                    #}
+                    <div class="detailed-information__comments-container comments">
+                        <span class="comments__title">Комментарий</span>
+                        <form class="comments__form" action="#" method="post">
+                            <label for="comment"></label><textarea class="comments__field" name="comment" id="comment" cols="30" rows="5" placeholder="Ваш комментарий..."></textarea>
+                            <button class="comments__send-button">Оправить</button>
+                        </form>
+                    </div>
+
+                    <span class="detailed-information__date date">Добавлена: <time class="date__format" datetime="2021-10-12">{{ project.time_create.date}}</time></span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+{% endblock content %}

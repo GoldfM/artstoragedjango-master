@@ -1,0 +1,91 @@
+{% extends 'artstorage/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+    <main class="main-container">
+        <section class="profile">
+            <h2 class="general-title">Профиль</h2>
+            <div class="profile__container">
+                <div class="profile__form form">
+                    <form class="form__user-information user-information" enctype="multipart/form-data" action="{% url 'editProfile' slug=user.slug%}" method="post">
+                        {% csrf_token %}
+                        <fieldset class="user-information__container">
+                            <div class="input-wrapper">
+                                {% render_field form.photo class="user-information__photo visually-hidden" type="file" name="photo" id="user-photo" %}
+{#                                <label for="user-photo" class="input-photo-label underlined_link">Добавить фото</label>#}
+                                <label class="user-information__label-photo" for="user-photo">{% if user.photo %}
+                                <img src="{{ user.photo.url }}" class="user-information__label-photo" alt="Фотография пользователя">
+                            {% else %}
+                                <img src="{% static 'artstorage/img/example.jpg' %}" class="user-information__label-photo" alt="Фотография пользователя">
+                            {% endif %}</label>
+
+
+                            </div>
+
+{#                            <input class="user-information__photo visually-hidden" type="file" name="photo" id="user-photo">#}
+                            <label class="visually-hidden" for="description-user">Описание пользователя</label>
+                            {% render_field form.descriptions class="user-information__description" name="description-user" id="description-user" cols="30" rows="5" placeholder="О себе" %}
+
+{#                            <textarea class="user-information__description" name="description-user" id="description-user" cols="30" rows="5" placeholder="О себе"></textarea>#}
+                            <output class="user-information__name">{{ user.first_name}} {{ user.last_name }}</output>
+                        </fieldset>
+
+                        <button type="submit" class="profile__form-button">Сохранить</button>
+                    </form>
+                </div>
+                <div class="profile__more-information more-information">
+                    <ul class="more-information__list reset-list">
+{#                        <li class="more-information__item">#}
+{#                            Нравится <span>4</span>#}
+{#                        </li>#}
+                        <li class="more-information__item">
+                            Картины <span>{{ user.count_projects }}</span>
+                        </li>
+                        <li class="more-information__item">
+                            Подписки <span>{{ user.count_followings }}</span>
+                        </li>
+                        <li class="more-information__item">
+                            Подписчики <span>{{ user.count_followers }}</span>
+                        </li>
+                    </ul>
+
+                    <div class="more-information__project project">
+                        <div class="project__wrapper">
+                            <button class="project__add"><span class="plus"></span></button>
+                            <span class="project__title">Проекты</span>
+                            <!-- href="../pages/personal-profile-projects.html -->
+                        </div>
+                        <!-- <div class="project__wrapper">
+                            <a class="project__add" href="../pages/personal-profile-pictures.html"><span class="plus"></span></a>
+                            <span class="project__title">Картины</span>
+                        </div> -->
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <div class="popup visually-hidden">
+            <div class="popup__container">
+                <a class="close"></a>
+                <p class="popup__title">Ваша работа</p>
+                <form class="popup__form" enctype="multipart/form-data" method="post" action="{% url 'addProject' %}">
+                    {% csrf_token %}
+                    <fieldset class="popup__data data">
+                        <label for="project-name"></label>
+{#                        <input class="data__name" type="text" id="project-name" placeholder="Название">#}
+                        {{ formProj.name }}
+                        <label class="personal-project__add-new" for="choose-personal-project"><span class="plus"></span></label>
+                        {{ formProj.image }}
+{#                        <input class="visually-hidden" type="file" id="choose-personal-project"></input>#}
+                        <button class="data__button-send" type="submit">Сохранить</button>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+
+    </main>
+    <script src="{% static 'artstorage/popup.js' %}"></script>
+
+{% endblock content %}

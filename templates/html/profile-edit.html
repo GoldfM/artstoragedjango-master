@@ -1,0 +1,64 @@
+{% extends 'artstorage/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+    <main class="main-container">
+        <section class="profile">
+            <h2 class="general-title">Профиль</h2>
+            <div class="profile__container">
+                <div class="profile__form form">
+                    <form class="form__user-information user-information" enctype="multipart/form-data" autocomplete action="" method="post">
+                        {% csrf_token %}
+                        <fieldset class="user-information__container">
+                            <div class="user-information__label-photo input-wrapper" for="user-photo">
+
+                                {% render_field form.photo class="input_file" id="input_file" %}
+                                                            <img src="{% static 'artstorage/img/photo-icon.svg' %}" alt="" class="add-photo-icon">
+
+                                <input type="file" name="user-photo" value="Добавить фото" multiple accept="image/*,image/jpeg,png" id="input_file" class="input_file" >
+                                <label for="input_file" >Добавить аватар проекта</label>
+                            </div>
+                            <label class="visually-hidden" for="description-user">Описание пользователя</label>
+                            {% render_field form.descriptions class="user-information__description" id="description-user" cols="30" rows="5" placeholder="О себе"%}
+
+{#                            <textarea class="user-information__description" name="description-user" id="description-user" cols="30" rows="5" placeholder="О себе"></textarea>#}
+                            <output class="user-information__name">Александр Богdsfsdfдан</output>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="profile__more-information more-information">
+                    <ul class="more-information__list reset-list">
+                        <li class="more-information__item">
+                            Нравится <span>4</span>
+                        </li>
+                        <li class="more-information__item">
+                            Проекты <span>1</span>
+                        </li>
+                        <li class="more-information__item">
+                            Картины <span>5</span>
+                        </li>
+                        <li class="more-information__item">
+                            Подписки <span>20</span>
+                        </li>
+                        <li class="more-information__item">
+                            Подписчики <span>9</span>
+                        </li>
+                    </ul>
+
+                    <div class="more-information__project project">
+                        <div class="project__wrapper">
+                            <a class="project__add" href="{% url 'personal-profile-projects' %}"><span class="plus"></span></a>
+                            <span class="project__title">Проекты</span>
+                        </div>
+                        <div class="project__wrapper">
+                            <a class="project__add" href="{% url 'personal-profile-pictures' %}"><span class="plus"></span></a>
+                            <span class="project__title">Картины</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+{% endblock content %}

@@ -1,0 +1,48 @@
+{% extends 'artstorage/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{%  block content %}
+
+
+    <main class="main-container">
+        <section class="registration">
+            <h2 class="registration__author-title">Регистрация автора</h2>
+            <form class="registration__form form" action="{% url 'registration' %}" method="post">
+                {% csrf_token %}
+
+                <fieldset class="form__container description">
+                    <label class="description__label label">
+                        <span class="label__text">Логин</span>
+                        {% render_field form.username class="label__value" type="text"%}
+                    </label>
+                    <label class="description__label">
+                        <span class="label__text">Имя</span>
+                        {% render_field form.first_name class="label__value" type="text"%}
+                    </label>
+                    <label class="description__label">
+                        <span class="label__text">Фамилия</span>
+                        {% render_field form.last_name class="label__value" type="text"%}
+                    </label>
+                    <label class="description__label">
+                        <span class="label__text">Почта</span>
+                        {% render_field form.email class="label__value" type="text"%}
+
+{#                        <input class="label__value" type="email" name="email">#}
+                    </label>
+                    <label class="description__label">
+                        <span class="label__text">Пароль</span>
+                        {% render_field form.password1 class="label__value" type="password"%}
+{#                        <input class="label__value" type="password" name="password">#}
+                    </label>
+                    <label class="description__label">
+                        <span class="label__text">Повторите пароль</span>
+                        {% render_field form.password2 class="label__value" type="password"%}
+{#                        <input class="label__value" type="password" name="password">#}
+                    </label>
+                </fieldset>
+                <button class="form__send-button">Зарегистрироваться</button>
+            </form>
+        </section>
+    </main>
+
+{% endblock content %}
