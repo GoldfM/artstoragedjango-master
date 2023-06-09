@@ -98,13 +98,8 @@ class Project(models.Model):
     def get_absolute_url(self):
         return reverse('project', kwargs={'project_slug': self.slug, 'user_slug': self.user.slug})
 
-
-    def get_rate_registred(self):
-        if self.count_registred==0:
-            return 0
-        return round(self.sum_registred / self.count_registred, 1)
-
-
+    def get_count_likes(self):
+        return Like.objects.filter(project_liked=self).count()
     class Meta:
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'
@@ -114,3 +109,11 @@ class ViewModel(models.Model):
     project_watch = models.ForeignKey('Project', on_delete=models.CASCADE, verbose_name='Проект')
     user_watch = models.ForeignKey('User', on_delete=models.CASCADE, verbose_name='Проект')
 
+
+
+
+
+
+class Like(models.Model):
+    user_liked = models.ForeignKey('User', on_delete=models.CASCADE, verbose_name='юзер')
+    project_liked = models.ForeignKey('Project', on_delete=models.CASCADE, verbose_name='Проект')

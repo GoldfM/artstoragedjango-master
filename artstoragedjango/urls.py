@@ -40,7 +40,12 @@ urlpatterns = [
     path('personal-profile-projects', personal_profile_projects, name='personal-profile-projects'),
     path('personal-profile-pictures', personal_profile_pictures, name='personal-profile-pictures'),
     path('subscribe', SubscribeView.as_view(), name='subscribe'),
-    path('unsubscribe', UnsubscribeView.as_view(), name='unsubscribe')
+    path('unsubscribe', UnsubscribeView.as_view(), name='unsubscribe'),
+
+
+
+
+    path('like', like, name='like')
 
 ]
 

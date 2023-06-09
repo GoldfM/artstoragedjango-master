@@ -5,7 +5,20 @@ from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, UpdateView, View, ListView
 
-from artstorage.models import User, Project, ViewModel, Follow
+
+
+from artstorage.models import User, Project, ViewModel, Follow, Like
+def like(request):
+    from django.shortcuts import redirect
+
+    project = request.GET.get('project_id')
+    project = Project.objects.get(id=project)
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if Like.objects.filter(user_liked=request.user, project_liked=project).count() == 0:
+        a = Like(user_liked=request.user, project_liked=project)
+        a.save()
+    return redirect('project', user_slug=project.user.slug, project_slug=project.slug)
 
 
 def index(request):
@@ -14,6 +27,8 @@ def index(request):
 
 def authors(request):
     return render(request, 'artstorage/authors.html')
+
+
 class AuthorsView(ListView):
     paginate_by = 3
     model = User
@@ -23,12 +38,15 @@ class AuthorsView(ListView):
     def get_queryset(self):
         return User.objects.order_by('-time_create')
 
+
 def pictures(request):
     return render(request, 'artstorage/pictures.html')
 
 
 def projects(request):
     return render(request, 'artstorage/pictures.html')
+
+
 class ProjectsView(ListView):
     model = Project
     paginate_by = 9
@@ -37,11 +55,13 @@ class ProjectsView(ListView):
 
     def get_queryset(self):
         return Project.objects.all().order_by('-time_create')
+
+
 def registration(request):
     from artstorage.forms import CustomUserCreationForm
     if request.method == "GET":
         form = CustomUserCreationForm()
-        return render(request, 'artstorage/registration.html', {'form':form})
+        return render(request, 'artstorage/registration.html', {'form': form})
     else:
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -52,6 +72,7 @@ def registration(request):
             new_user = authenticate(username=username, password=pass1)
             login(request, new_user)
             return redirect('home')
+
 
 class LoginUser(LoginView):
     template_name = 'artstorage/authorization.html'
@@ -64,11 +85,15 @@ class LoginUser(LoginView):
     def get_success_url(self):
         return reverse_lazy('home')
 
+
 def authorization(request):
     return render(request, 'artstorage/authorization.html')
 
+
 def profile(request):
     return render(request, 'artstorage/update-profile.html')
+
+
 class Profile(DetailView):
     model = User
     template_name = 'artstorage/profile.html'
@@ -77,20 +102,21 @@ class Profile(DetailView):
     def get(self, request, *args, **kwargs):
         from artstorage.forms import CreateProject
         slug = self.kwargs.get(self.slug_url_kwarg, None)
-        user_profile = get_object_or_404(User,slug=slug)
+        user_profile = get_object_or_404(User, slug=slug)
         is_your_profile = False
         if request.user.is_authenticated:
             if user_profile.id == request.user.id:
                 is_your_profile = True
                 # Пользователь открывает свой профиль
 
-          # Пользователь открывает профиль другого пользователя
+        # Пользователь открывает профиль другого пользователя
         form = CreateProject()
         return render(request, 'artstorage/profile.html', {'user': user_profile,
                                                            'is_your_profile': is_your_profile,
-                                                           'projects':user_profile.get_projects(),
+                                                           'projects': user_profile.get_projects(),
                                                            'title': slug,
                                                            'form': form})
+
 
 class ProfileUpdateView(UpdateView):
     model = User
@@ -101,6 +127,7 @@ class ProfileUpdateView(UpdateView):
 
     '''def get_success_url(self):
         return reverse_lazy('profile',kwargs = {'slug': self.request.user.slug})'''
+
     def get(self, request, *args, **kwargs):
         slug = self.kwargs.get(self.slug_url_kwarg, None)
         user_profile = get_object_or_404(User, slug=slug)
@@ -109,12 +136,13 @@ class ProfileUpdateView(UpdateView):
                 self.object = self.get_object()
                 return super().get(request, *args, **kwargs)
         raise PermissionDenied()
+
     def post(self, request, *args, **kwargs):
         user_profile = get_object_or_404(User, slug=self.kwargs.get(self.slug_url_kwarg, None))
 
-        return  super().post(request, args, kwargs)
+        return super().post(request, args, kwargs)
 
-    def get_context_data(self, *, object_list = None, **kwargs):
+    def get_context_data(self, *, object_list=None, **kwargs):
 
         context = super().get_context_data(**kwargs)
         context['title'] = "Редактирование профиля"
@@ -122,25 +150,27 @@ class ProfileUpdateView(UpdateView):
         context['formProj'] = CreateProject()
         return context
 
+
 class ProjectsUser(ListView):
     paginate_by = 3
     model = Project
     template_name = 'artstorage/author-profile.html'
     context_object_name = 'projects'
+
     def get_queryset(self):
-        user = get_object_or_404(User, slug = self.request.path_info.split('/')[2])
+        user = get_object_or_404(User, slug=self.request.path_info.split('/')[2])
         return user.get_projects()
+
     def get_context_data(self, *, object_list=None, **kwargs):
 
         context = super().get_context_data(**kwargs)
-        user = get_object_or_404(User, slug = self.request.path_info.split('/')[2])
+        user = get_object_or_404(User, slug=self.request.path_info.split('/')[2])
         context['user'] = user
         if self.request.user.is_authenticated:
             context['is_not_your_profile'] = self.request.user.slug != user.slug
         else:
             context['is_not_your_profile'] = True
         return context
-
 
 
 def picture_description(request):
@@ -154,15 +184,18 @@ def personal_profile_projects(request):
 def personal_profile_pictures(request):
     return render(request, 'artstorage/../templates/personal-profile-pictures.html')
 
+
 class ProjectView(DetailView):
     model = Project
 
     template_name = 'artstorage/picture-description.html'
+
     def get_object(self, queryset=None):
         slug_user = self.kwargs['user_slug']
         slug_project = self.kwargs['project_slug']
         user = User.objects.get(slug=slug_user)
         return user.get_projects().get(slug=slug_project)
+
     def get_context_data(self, **kwargs):
         slug_user = self.kwargs['user_slug']
         slug_project = self.kwargs['project_slug']
@@ -183,22 +216,23 @@ class ProjectView(DetailView):
         else:
             context['is_not_your_profile'] = True
 
-
-
         return context
 
 
 def logout_user(request):
     logout(request)
     return redirect('home')
+
+
 def AddProject(request):
     print(request.POST)
     print(request.FILES)
-    name=request.POST.get('name')
-    image=request.FILES.get('image')
+    name = request.POST.get('name')
+    image = request.FILES.get('image')
     a = Project(name=name, photo=image, user=request.user)
     a.save()
-    return redirect('profile', slug = request.user.slug)
+    return redirect('profile', slug=request.user.slug)
+
 
 class SubscribeView(View):
     def post(self, request):
@@ -216,6 +250,7 @@ class SubscribeView(View):
         a.save()
 
         return redirect(redirect_url)
+
 
 class UnsubscribeView(View):
     def post(self, request):

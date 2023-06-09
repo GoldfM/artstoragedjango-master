@@ -15,7 +15,12 @@
 
                 <div class="details__container detailed-information">
                     <div class="detailed-information__container author-information">
-                        <a href="{{ project.user.get_absolute_url }}"><img class="author-information__photo" src="{{ user.photo.url }}" alt="#"></a>
+                        {% if user.photo %}
+                            <a href="{{ project.user.get_absolute_url }}"><img class="author-information__photo" src="{{ user.photo.url }}" alt="#"></a>
+                        {% else %}
+                            <a href="{{ project.user.get_absolute_url }}"><img class="author-information__photo" src="{% static 'artstorage/img/example.jpg' %}" alt="#"></a>
+
+                        {% endif %}
                         <span class="author-information__name">{{ user.get_short_name }}</span>
                         {% if is_not_your_profile %}
                         {% if request.user.is_authenticated %}
@@ -52,6 +57,18 @@
                             </defs>
                         </svg>
                         <span class="views__amount">{{ project.count_watches }}</span>
+                    </div>
+                    <div class="likes">
+
+                        <form action="{% url 'like' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="project_id" value="{{ project.id }}">
+                            <input type="hidden" name="redirect_url" value="{{ request.get_full_path }}">
+                            <button type="submit" class="likes__button">
+                                <img src="{% static 'artstorage/img/icons8-like-30.png' %}" alt="Лайк">
+                            </button>
+                        </form>
+                        <span class="likes__amount">{{ project.get_count_likes }}</span>
                     </div>
 
 {#                    <div class="likes">#}
